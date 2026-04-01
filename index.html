@@ -1,667 +1,754 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="antialiased">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Storyline Simulation Maker™ | Enterprise AI</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Storyline Simulation Maker™ | Next-Gen ID Platform</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap');
 
+        /* --- THE ULTIMATE DESIGN SYSTEM --- */
         :root {
-            --bg-color: #f8fafc;
-            --card-bg: #ffffff;
-            --text-main: #0f172a;
-            --text-muted: #64748b;
-            --primary: #0f172a; /* Sleek black/dark slate */
-            --primary-hover: #334155;
-            --accent: #2563eb; /* Corporate blue */
-            --border-color: #e2e8f0;
+            /* Palette - Ultra Premium Light Mode */
+            --bg-base: #fcfcfd;
+            --bg-surface: #ffffff;
+            --bg-elevated: rgba(255, 255, 255, 0.7);
+            --text-primary: #09090b;
+            --text-secondary: #52525b;
+            --text-tertiary: #a1a1aa;
+            --accent-main: #000000;
+            --accent-glow: rgba(0, 0, 0, 0.15);
+            --border-light: #e4e4e7;
+            --border-focus: #18181b;
             --error: #ef4444;
-            --font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --success: #10b981;
+            
+            /* Typography */
+            --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+            
+            /* Fluid Spacing & Shadows */
+            --shadow-float: 0 20px 40px -15px rgba(0,0,0,0.05), 0 0 0 1px rgba(0,0,0,0.03);
+            --shadow-pop: 0 30px 60px -20px rgba(0,0,0,0.12), 0 0 0 1px rgba(0,0,0,0.05);
+            --radius-lg: 16px;
+            --radius-full: 9999px;
+            
+            /* Animation Curves */
+            --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+            --ease-in-out-circ: cubic-bezier(0.85, 0, 0.15, 1);
+            --ease-spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
-        * {
+        /* --- BASE RESET & GLOBAL STYLES --- */
+        *, *::before, *::after {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: var(--font-family);
-            -webkit-font-smoothing: antialiased;
         }
 
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-main);
+        html, body {
+            width: 100%;
+            height: 100%;
+            background-color: var(--bg-base);
+            color: var(--text-primary);
+            font-family: var(--font-sans);
             overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            overscroll-behavior: none;
+        }
+
+        /* --- BACKGROUND CANVAS ANIMATION --- */
+        #ambient-canvas {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            z-index: 0;
+            pointer-events: none;
+            opacity: 0.4;
+        }
+
+        /* --- LAYOUT ARCHITECTURE --- */
+        #app-root {
+            position: relative;
+            z-index: 10;
             display: flex;
             flex-direction: column;
             min-height: 100vh;
         }
 
-        /* --- Navigation Bar --- */
+        /* --- NAVIGATION --- */
         nav {
-            background: var(--card-bg);
-            border-bottom: 1px solid var(--border-color);
-            padding: 1rem 5%;
+            position: fixed;
+            top: 0; width: 100%;
+            padding: 1.5rem clamp(1rem, 5vw, 4rem);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            position: sticky;
-            top: 0;
             z-index: 100;
+            background: var(--bg-elevated);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(0,0,0,0.03);
+            transition: transform 0.6s var(--ease-out-expo);
         }
 
         .logo {
             font-size: 1.25rem;
-            font-weight: 700;
-            letter-spacing: -0.02em;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
             cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
         }
 
-        .logo svg {
-            color: var(--accent);
-        }
+        .logo svg { width: 24px; height: 24px; }
 
-        .nav-links {
-            display: flex;
-            gap: 2rem;
-            align-items: center;
-        }
-
-        .nav-links a {
-            text-decoration: none;
-            color: var(--text-muted);
-            font-weight: 500;
-            font-size: 0.95rem;
-            cursor: pointer;
-            transition: var(--transition);
-        }
-
-        .nav-links a:hover, .nav-links a.active-link {
-            color: var(--text-main);
-        }
-
-        .btn-nav {
-            background: var(--primary);
-            color: white !important;
-            padding: 0.6rem 1.2rem;
-            border-radius: 6px;
-            font-weight: 500;
-        }
-
-        .btn-nav:hover {
-            background: var(--primary-hover);
-        }
-
-        /* --- Main Content Area --- */
-        main {
-            flex: 1;
-            position: relative;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 2rem;
-        }
-
-        .page {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.5s ease;
-            padding: 2rem 5%;
-            overflow-y: auto; /* Fixes boundary issues */
-        }
-
-        .page.active {
-            opacity: 1;
-            pointer-events: auto;
-            position: relative; /* Allows content to push height naturally */
-        }
-
-        /* --- UI Panels --- */
-        .clean-panel {
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            padding: 3.5rem;
-            border-radius: 12px;
-            box-shadow: var(--shadow-lg);
-            max-width: 900px;
-            width: 100%;
-        }
-
-        h1 {
-            font-size: 3.5rem;
-            font-weight: 700;
-            letter-spacing: -0.04em;
-            margin-bottom: 1.5rem;
-            line-height: 1.1;
-            text-align: center;
-        }
-
-        p.subtitle {
-            color: var(--text-muted);
-            font-size: 1.2rem;
-            line-height: 1.6;
-            margin-bottom: 3rem;
-            text-align: center;
-            max-width: 700px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        /* --- Buttons --- */
-        .btn-main {
-            background: var(--accent);
-            color: white;
-            font-weight: 500;
-            font-size: 1.1rem;
-            padding: 1rem 2.5rem;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: var(--transition);
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-            margin: 0 auto;
-            display: block;
-        }
-
-        .btn-main:hover {
-            background: #1d4ed8;
-            transform: translateY(-1px);
-            box-shadow: var(--shadow-md);
-        }
-
-        /* --- Fake Pages (Pricing & About) --- */
-        .pricing-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 2rem;
-            width: 100%;
-            max-width: 1000px;
-        }
-
-        .pricing-card {
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 2.5rem;
-            text-align: center;
-            box-shadow: var(--shadow-sm);
-            display: flex;
-            flex-direction: column;
-        }
-
-        .pricing-card.popular {
-            border-color: var(--accent);
-            box-shadow: var(--shadow-md);
-            position: relative;
-        }
-
-        .pricing-card.popular::before {
-            content: 'Most Popular';
-            position: absolute;
-            top: -12px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: var(--accent);
-            color: white;
-            font-size: 0.75rem;
-            font-weight: 600;
-            padding: 0.25rem 0.75rem;
-            border-radius: 20px;
-        }
-
-        .pricing-card h3 { font-size: 1.5rem; margin-bottom: 0.5rem; }
-        .pricing-card .price { font-size: 3rem; font-weight: 700; margin-bottom: 1rem; color: var(--text-main); }
-        .pricing-card .price span { font-size: 1rem; color: var(--text-muted); font-weight: 400; }
-        .pricing-card ul { list-style: none; text-align: left; margin-bottom: 2rem; flex: 1; }
-        .pricing-card ul li { margin-bottom: 0.75rem; font-size: 0.95rem; color: var(--text-muted); display: flex; align-items: center; gap: 0.5rem; }
-
-        .about-content {
-            max-width: 700px;
-            margin: 0 auto;
-            text-align: left;
-        }
+        .nav-items { display: flex; gap: 2.5rem; align-items: center; }
         
-        .about-content h2 { font-size: 2.5rem; margin-bottom: 1.5rem; }
-        .about-content p { font-size: 1.1rem; color: var(--text-muted); line-height: 1.7; margin-bottom: 1.5rem; }
+        .nav-link {
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            text-decoration: none;
+            cursor: pointer;
+            transition: color 0.2s ease;
+            position: relative;
+        }
 
-        /* --- Dashboard --- */
+        .nav-link:hover { color: var(--text-primary); }
+        .nav-link::after {
+            content: ''; position: absolute; bottom: -4px; left: 0;
+            width: 0%; height: 2px; background: var(--accent-main);
+            transition: width 0.3s var(--ease-out-expo);
+        }
+        .nav-link:hover::after { width: 100%; }
+
+        /* --- CORE PAGE ROUTING --- */
+        .view-layer {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 6rem clamp(1rem, 5vw, 3rem) 3rem;
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transform: translateY(20px) scale(0.98);
+            transition: opacity 0.6s var(--ease-out-expo), transform 0.8s var(--ease-out-expo), visibility 0s linear 0.6s;
+        }
+
+        .view-layer.is-active {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+            transform: translateY(0) scale(1);
+            transition: opacity 0.6s var(--ease-out-expo), transform 0.8s var(--ease-out-expo), visibility 0s linear 0s;
+        }
+
+        /* --- TYPOGRAPHY --- */
+        h1 {
+            font-size: clamp(3rem, 8vw, 6rem);
+            font-weight: 800;
+            letter-spacing: -0.04em;
+            line-height: 1.05;
+            text-align: center;
+            max-width: 1000px;
+            margin: 0 auto 1.5rem;
+            background: linear-gradient(135deg, #000 0%, #444 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            font-size: clamp(1.1rem, 2vw, 1.5rem);
+            color: var(--text-secondary);
+            text-align: center;
+            max-width: 650px;
+            margin: 0 auto 3rem;
+            line-height: 1.6;
+        }
+
+        /* --- HIGH-END BUTTONS --- */
+        .magnetic-btn-wrapper {
+            display: inline-block;
+            padding: 20px; /* Magnetic capture area */
+            margin: -20px;
+        }
+
+        .btn-primary {
+            background: var(--accent-main);
+            color: #fff;
+            border: none;
+            padding: 1.25rem 2.5rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: var(--radius-full);
+            cursor: pointer;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            transition: transform 0.2s linear, box-shadow 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            will-change: transform;
+        }
+
+        .btn-primary:hover {
+            box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+        }
+
+        .btn-primary svg { transition: transform 0.3s var(--ease-spring); }
+        .btn-primary:hover svg { transform: translateX(5px); }
+
+        /* --- DASHBOARD UI --- */
+        .glass-panel {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-float);
+            width: 100%;
+            max-width: 1100px;
+            padding: clamp(2rem, 5vw, 4rem);
+            transition: box-shadow 0.4s ease;
+        }
+
+        .glass-panel:hover { box-shadow: var(--shadow-pop); }
+
         .dashboard-grid {
             display: grid;
-            grid-template-columns: 1.8fr 1fr;
-            gap: 2rem;
-            text-align: left;
-            margin-bottom: 2rem;
+            grid-template-columns: 1.5fr 1fr;
+            gap: 3rem;
+            margin-bottom: 2.5rem;
         }
 
-        .input-group { position: relative; }
-
+        /* Custom Textarea */
+        .input-wrapper { position: relative; height: 100%; }
+        
         textarea {
-            width: 100%;
-            height: 100%;
-            min-height: 240px;
+            width: 100%; height: 100%; min-height: 250px;
+            background: #f8fafc;
+            border: 1px solid var(--border-light);
+            border-radius: 12px;
             padding: 1.5rem;
-            background: #ffffff;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            color: var(--text-main);
-            font-size: 1rem;
+            font-size: 1.05rem;
             line-height: 1.6;
+            color: var(--text-primary);
             resize: none;
-            transition: var(--transition);
+            transition: all 0.3s var(--ease-out-expo);
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
         }
 
         textarea:focus {
             outline: none;
-            border-color: var(--accent);
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+            background: #fff;
+            border-color: var(--accent-main);
+            box-shadow: 0 0 0 4px var(--accent-glow);
         }
 
-        textarea.input-error {
-            border-color: var(--error);
-            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
-            animation: shake 0.4s ease-in-out;
-        }
+        textarea::placeholder { color: var(--text-tertiary); }
 
+        .error-shake { animation: shake 0.5s var(--ease-spring); border-color: var(--error) !important; }
         @keyframes shake {
             0%, 100% { transform: translateX(0); }
-            20%, 60% { transform: translateX(-4px); }
-            40%, 80% { transform: translateX(4px); }
+            25% { transform: translateX(-8px); }
+            75% { transform: translateX(8px); }
         }
 
-        .error-msg {
-            display: none;
-            color: var(--error);
-            font-size: 0.85rem;
-            font-weight: 500;
-            margin-top: 0.5rem;
-            position: absolute;
-            bottom: -22px;
-            left: 0;
+        /* Expert Toggles */
+        .settings-stack { display: flex; flex-direction: column; gap: 1.5rem; }
+        
+        .setting-group {
+            background: #fcfcfc;
+            border: 1px solid var(--border-light);
+            padding: 1.25rem;
+            border-radius: 12px;
         }
 
-        .controls {
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
-            padding: 1.5rem;
-            background: var(--bg-color);
-            border-radius: 8px;
-            border: 1px solid var(--border-color);
-        }
-
-        .controls label {
-            font-size: 0.9rem;
-            font-weight: 600;
+        .setting-header {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 0.5rem;
+            align-items: center;
+            margin-bottom: 0.75rem;
+            font-weight: 600;
+            font-size: 0.95rem;
         }
 
-        .controls label span { color: var(--accent); }
+        .badge {
+            background: #f1f5f9; color: var(--text-secondary);
+            font-size: 0.75rem; padding: 0.2rem 0.6rem;
+            border-radius: var(--radius-full); font-weight: 700;
+        }
 
+        /* Custom Range Slider */
         input[type="range"] {
-            -webkit-appearance: none;
-            width: 100%;
-            height: 4px;
-            background: #cbd5e1;
-            border-radius: 4px;
-            outline: none;
+            -webkit-appearance: none; width: 100%; height: 6px;
+            background: var(--border-light); border-radius: 4px; outline: none;
         }
-
         input[type="range"]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            width: 18px;
-            height: 18px;
-            border-radius: 50%;
-            background: white;
-            border: 2px solid var(--accent);
-            cursor: pointer;
+            -webkit-appearance: none; width: 22px; height: 22px;
+            border-radius: 50%; background: #fff; border: 2px solid var(--accent-main);
+            cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: transform 0.2s var(--ease-spring);
         }
+        input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.2); }
 
-        /* --- Loading Sequence --- */
-        .loader-container {
-            text-align: center;
-            max-width: 600px;
-            width: 100%;
+        /* Custom Toggle Switch */
+        .switch-wrapper { display: flex; justify-content: space-between; align-items: center; }
+        .switch-label { font-size: 0.9rem; font-weight: 500; color: var(--text-secondary); }
+        .switch {
+            position: relative; display: inline-block; width: 44px; height: 24px;
         }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider {
+            position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+            background-color: var(--border-light); transition: .4s; border-radius: 24px;
+        }
+        .slider:before {
+            position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px;
+            background-color: white; transition: .4s var(--ease-spring); border-radius: 50%;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        input:checked + .slider { background-color: var(--accent-main); }
+        input:checked + .slider:before { transform: translateX(20px); }
 
-        .progress-bar-bg {
-            width: 100%;
-            height: 6px;
-            background: var(--border-color);
-            border-radius: 10px;
+        /* --- GENERATION TERMINAL (The Setup) --- */
+        .terminal-container {
+            width: 100%; max-width: 800px;
+            background: #09090b;
+            border-radius: 12px;
             overflow: hidden;
-            margin-bottom: 2rem;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
+            border: 1px solid #27272a;
         }
 
-        .progress-bar-fill {
-            width: 0%;
-            height: 100%;
-            background: var(--accent);
-            border-radius: 10px;
-            transition: width 0.3s linear;
+        .terminal-header {
+            background: #18181b; padding: 1rem 1.5rem;
+            display: flex; align-items: center; gap: 0.5rem;
+            border-bottom: 1px solid #27272a;
         }
 
-        .status-text {
-            font-size: 1.2rem;
-            font-weight: 500;
-            color: var(--text-main);
-            height: 30px;
-            transition: opacity 0.3s;
-        }
+        .term-dot { width: 12px; height: 12px; border-radius: 50%; }
+        .term-dot.r { background: #ef4444; }
+        .term-dot.y { background: #eab308; }
+        .term-dot.g { background: #22c55e; }
 
-        .status-subtext {
-            font-size: 0.9rem;
-            color: var(--text-muted);
-            margin-top: 0.5rem;
-            font-family: monospace;
-        }
-
-        /* --- Final Reveal Message --- */
-        .reveal-card {
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            text-align: left;
-            padding: 4rem;
-            max-width: 750px;
-            width: 100%;
-            border-top: 4px solid var(--accent);
-            box-shadow: var(--shadow-lg);
-            /* Prevents boundary issues */
-            max-height: 90vh;
+        .terminal-body {
+            padding: 2rem;
+            height: 400px;
             overflow-y: auto;
-        }
-
-        .reveal-card h2 {
-            font-size: 2.2rem;
-            margin-bottom: 1.5rem;
-            font-weight: 700;
-            letter-spacing: -0.02em;
-        }
-
-        .reveal-card p {
-            font-size: 1.1rem;
-            line-height: 1.8;
-            margin-bottom: 1.5rem;
-            color: var(--text-muted);
-        }
-
-        .reveal-card p strong { color: var(--text-main); }
-
-        .signature {
-            margin-top: 3rem;
-            padding-top: 2rem;
-            border-top: 1px solid var(--border-color);
-            display: flex;
-            align-items: center;
-            gap: 1.25rem;
-        }
-
-        .avatar {
-            width: 60px;
-            height: 60px;
-            background: var(--bg-color);
-            border: 1px solid var(--border-color);
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-weight: 600;
-            font-size: 1.2rem;
-            color: var(--accent);
-        }
-
-        .sig-text h4 {
-            font-size: 1.1rem;
-            color: var(--text-main);
-            font-weight: 600;
-            margin-bottom: 0.2rem;
-        }
-
-        .sig-text span {
-            color: var(--text-muted);
+            font-family: var(--font-mono);
             font-size: 0.9rem;
-            line-height: 1.4;
-            display: block;
+            color: #a1a1aa;
+            display: flex; flex-direction: column; gap: 0.5rem;
         }
 
-        /* Responsive */
-        @media (max-width: 768px) {
-            .dashboard-grid { grid-template-columns: 1fr; }
-            h1 { font-size: 2.5rem; }
-            .nav-links { display: none; }
-            .clean-panel { padding: 2rem; }
+        .log-line { opacity: 0; animation: fadeInLog 0.3s forwards; display: flex; gap: 1rem; }
+        .log-time { color: #52525b; user-select: none; }
+        .log-msg { color: #e4e4e7; }
+        .log-msg.highlight { color: #38bdf8; }
+        .log-msg.warn { color: #facc15; }
+        .log-msg.error { color: #f87171; font-weight: bold; }
+
+        @keyframes fadeInLog { to { opacity: 1; } }
+
+        /* Progress Bar */
+        .progress-container { width: 100%; background: #27272a; height: 4px; position: relative; }
+        .progress-bar { height: 100%; background: #38bdf8; width: 0%; transition: width 0.2s linear; }
+        .progress-glow {
+            position: absolute; right: 0; top: -5px; width: 20px; height: 14px;
+            background: #38bdf8; filter: blur(8px);
+        }
+
+        /* --- THE REVEAL (The Punchline) --- */
+        .reveal-modal {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-light);
+            border-top: 4px solid var(--accent-main);
+            padding: 4rem;
+            border-radius: var(--radius-lg);
+            max-width: 800px;
+            width: 100%;
+            box-shadow: var(--shadow-pop);
+            text-align: left;
+        }
+
+        .reveal-modal h2 { font-size: 2.5rem; font-weight: 800; margin-bottom: 1.5rem; letter-spacing: -0.02em; }
+        
+        .reveal-modal p {
+            font-size: 1.15rem;
+            line-height: 1.8;
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+        }
+
+        .reveal-modal p strong { color: var(--text-primary); }
+
+        .id-badge-container {
+            margin-top: 3rem;
+            padding-top: 2.5rem;
+            border-top: 1px solid var(--border-light);
+            display: flex; align-items: center; gap: 1.5rem;
+        }
+
+        .avatar-glitch {
+            width: 70px; height: 70px;
+            background: #000;
+            border-radius: 50%;
+            display: flex; justify-content: center; align-items: center;
+            color: #fff; font-weight: 800; font-size: 1.5rem;
+            position: relative; overflow: hidden;
+        }
+
+        .avatar-glitch::after {
+            content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            animation: sweep 3s infinite;
+        }
+
+        @keyframes sweep { 100% { left: 200%; } }
+
+        .id-details h4 { font-size: 1.25rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.25rem; }
+        .id-details p { font-size: 0.95rem; color: var(--text-tertiary); margin: 0; line-height: 1.4; }
+
+        /* Responsive Breakpoints */
+        @media (max-width: 1024px) {
+            .dashboard-grid { grid-template-columns: 1fr; gap: 2rem; }
+            .nav-items { display: none; } /* Hide nav on small screens for simplicity */
+        }
+        @media (max-width: 600px) {
+            .glass-panel, .reveal-modal { padding: 2rem; }
+            .terminal-body { height: 300px; padding: 1rem; }
+            .id-badge-container { flex-direction: column; align-items: flex-start; gap: 1rem; }
         }
     </style>
 </head>
 <body>
 
-    <nav>
-        <div class="logo" onclick="navTo('landing')">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
-            Storyline Simulation Maker™
-        </div>
-        <div class="nav-links">
-            <a onclick="navTo('landing')" id="link-landing" class="active-link">Product</a>
-            <a onclick="navTo('about')" id="link-about">About</a>
-            <a onclick="navTo('pricing')" id="link-pricing">Pricing</a>
-            <a onclick="navTo('dashboard')" class="btn-nav">Workspace Login</a>
-        </div>
-    </nav>
+    <canvas id="ambient-canvas"></canvas>
 
-    <main>
-        <div id="page-landing" class="page active">
-            <h1>The end of manual triggers.</h1>
-            <p class="subtitle">Enterprise-grade AI that builds branching scenarios, custom states, and complex variables directly from natural language. Export instantly to .story files.</p>
-            <button class="btn-main" onclick="navTo('dashboard')">Start Generating for Free</button>
-        </div>
-
-        <div id="page-about" class="page">
-            <div class="about-content">
-                <h2>Built by Learning Architects.</h2>
-                <p>Storyline Simulation Maker™ was founded in 2025 by a team of ex-Articulate engineers and enterprise Instructional Designers who were tired of clicking the "Add Trigger" button 400 times a day.</p>
-                <p>We trained our proprietary Large Learning Model (LLM) on over 2 million SCORM packages, extracting the perfect pedagogical logic for branching scenarios, software simulations, and compliance training.</p>
-                <p>Our mission is simple: eliminate the busywork so you can focus on the learning strategy.</p>
+    <div id="app-root">
+        <nav id="main-nav">
+            <div class="logo" onclick="Router.navigate('home')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+                StorylineMaker™
             </div>
-        </div>
-
-        <div id="page-pricing" class="page">
-            <h2 style="font-size: 2.5rem; margin-bottom: 3rem;">Simple, transparent pricing.</h2>
-            <div class="pricing-grid">
-                <div class="pricing-card">
-                    <h3>Freelancer</h3>
-                    <div class="price">$0<span>/mo</span></div>
-                    <ul>
-                        <li>✓ 3 AI Simulations / month</li>
-                        <li>✓ Standard Variable Logic</li>
-                        <li>✓ Basic Triggers</li>
-                        <li style="color: #cbd5e1;">✗ No Synthesia Sync</li>
-                    </ul>
-                    <button class="btn-main" style="width:100%; background: var(--bg-color); color: var(--text-main); border: 1px solid var(--border-color);" onclick="navTo('dashboard')">Start Free</button>
-                </div>
-                <div class="pricing-card popular">
-                    <h3>Professional</h3>
-                    <div class="price">$99<span>/mo</span></div>
-                    <ul>
-                        <li>✓ Unlimited AI Simulations</li>
-                        <li>✓ Complex Variable Architecture</li>
-                        <li>✓ Advanced State Generation</li>
-                        <li>✓ Synthesia API Integration</li>
-                    </ul>
-                    <button class="btn-main" style="width:100%;" onclick="navTo('dashboard')">Start 14-Day Trial</button>
-                </div>
-                <div class="pricing-card">
-                    <h3>Enterprise</h3>
-                    <div class="price">Custom</div>
-                    <ul>
-                        <li>✓ Dedicated LLM Instance</li>
-                        <li>✓ Custom Brand State Templates</li>
-                        <li>✓ Bulk .story Generation API</li>
-                        <li>✓ 24/7 SLA Support</li>
-                    </ul>
-                    <button class="btn-main" style="width:100%; background: var(--bg-color); color: var(--text-main); border: 1px solid var(--border-color);">Contact Sales</button>
-                </div>
+            <div class="nav-items">
+                <a class="nav-link" onclick="Router.navigate('home')">Product</a>
+                <a class="nav-link" href="#">Integrations</a>
+                <a class="nav-link" href="#">Enterprise</a>
+                <button class="btn-primary" style="padding: 0.6rem 1.2rem; font-size: 0.9rem;" onclick="Router.navigate('dashboard')">Open Workspace</button>
             </div>
-        </div>
+        </nav>
 
-        <div id="page-dashboard" class="page">
-            <div class="clean-panel">
-                <h2 style="font-size: 1.5rem; margin-bottom: 2rem; font-weight: 600;">Simulation Architect Workspace</h2>
-                <div class="dashboard-grid">
-                    <div class="input-group">
-                        <textarea id="ai-prompt" placeholder="Describe your module here. e.g., 'Build a branching scenario for de-escalating an angry customer. Include custom character states, track patience using numeric variables, and culminate in an interactive assessment...'"></textarea>
-                        <span id="prompt-error" class="error-msg">Please enter a structural prompt to begin generation.</span>
-                    </div>
-                    <div class="controls">
-                        <div>
-                            <label>Variable Logic Depth <span id="val-logic">85%</span></label>
-                            <input type="range" min="1" max="100" value="85" oninput="document.getElementById('val-logic').innerText = this.value + '%'">
-                        </div>
-                        <div>
-                            <label>Automated Triggers <span id="val-trig">Strict</span></label>
-                            <input type="range" min="1" max="3" value="3" oninput="const states=['Low','Normal','Strict']; document.getElementById('val-trig').innerText = states[this.value-1]">
-                        </div>
-                        <div>
-                            <label>WCAG 2.1 Compliance <span>Enforced</span></label>
-                            <input type="range" min="0" max="1" value="1" disabled style="opacity: 0.5;">
-                        </div>
-                    </div>
-                </div>
-                <button class="btn-main" style="width: 100%; padding: 1.2rem;" onclick="startGeneration()">
-                    Generate .story Project File
+        <main id="view-home" class="view-layer is-active">
+            <h1>The death of manual triggers.</h1>
+            <p class="subtitle">Deploy enterprise-grade AI to architect branching scenarios, manage complex states, and map conditional variables directly from natural language. Export flawlessly to .story format.</p>
+            
+            <div class="magnetic-btn-wrapper">
+                <button class="btn-primary" onclick="Router.navigate('dashboard')">
+                    Initialize Workspace 
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
                 </button>
             </div>
-        </div>
+        </main>
 
-        <div id="page-loading" class="page">
-            <div class="loader-container">
-                <h2 style="margin-bottom: 2rem; font-size: 1.8rem;">Compiling Project</h2>
-                <div class="progress-bar-bg">
-                    <div class="progress-bar-fill" id="progress-fill"></div>
-                </div>
-                <div class="status-text" id="status-text">Establishing secure connection...</div>
-                <div class="status-subtext" id="status-subtext">Initializing Engine v4.2</div>
-            </div>
-        </div>
-
-        <div id="page-reveal" class="page">
-            <div class="reveal-card">
-                <h2>Happy April Fools' Day.</h2>
-                <p>Let's be completely honest for a second. Did you actually think an AI was going to perfectly map out your Storyline triggers, layers, and conditional variables without creating an absolute mess?</p>
-                <p>As someone who spends his days deep in Articulate Storyline, Synthesia, and the Adobe Suite, let me assure you: <strong>our jobs are safe.</strong></p>
-                <p>AI is a fantastic tool, but it cannot replace the empathy, the pedagogical insight, the necessary sarcasm, and the sheer willpower it takes to design a truly effective learning experience. It takes a real human to understand <em>why</em> a learner needs to click that button in the first place.</p>
-                <p>Keep building those branching scenarios, keep fighting with custom states, and keep making learning actually work.</p>
+        <main id="view-dashboard" class="view-layer">
+            <div class="glass-panel">
+                <h2 style="font-size: 1.75rem; margin-bottom: 2rem;">Simulation Architect <span style="color:var(--text-tertiary); font-weight: 400;">v4.2.0</span></h2>
                 
-                <div class="signature">
-                    <div class="avatar">NJ</div>
-                    <div class="sig-text">
-                        <h4>Naveen Jose</h4>
-                        <span>Certified Instructional Design Specialist (CIDS)<br>Assistant Manager – Training and Quality</span>
+                <div class="dashboard-grid">
+                    <div class="input-wrapper">
+                        <textarea id="ai-prompt" placeholder="Describe the instructional module... e.g., 'Build a branching simulation for de-escalating a frustrated client. Construct dynamic character states, track empathy scores via numeric variables, and culminate in an interactive drag-and-drop assessment.'"></textarea>
+                    </div>
+                    
+                    <div class="settings-stack">
+                        <div class="setting-group">
+                            <div class="setting-header">
+                                <span>Variable Logic Depth</span>
+                                <span class="badge" id="val-logic">85%</span>
+                            </div>
+                            <input type="range" min="1" max="100" value="85" oninput="document.getElementById('val-logic').innerText = this.value + '%'">
+                        </div>
+
+                        <div class="setting-group">
+                            <div class="setting-header">
+                                <span>Automated Trigger Mapping</span>
+                                <span class="badge" style="background: #fee2e2; color: #991b1b;" id="val-trig">Strict</span>
+                            </div>
+                            <input type="range" min="1" max="3" value="3" oninput="const s=['Lenient','Normal','Strict']; document.getElementById('val-trig').innerText = s[this.value-1]">
+                        </div>
+
+                        <div class="setting-group">
+                            <div class="switch-wrapper">
+                                <span class="switch-label">Auto-Generate Slide Layers</span>
+                                <label class="switch">
+                                    <input type="checkbox" checked>
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="setting-group">
+                            <div class="switch-wrapper">
+                                <span class="switch-label">Master Slide Architecture</span>
+                                <label class="switch">
+                                    <input type="checkbox" checked>
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                
-                <button class="btn-main" style="margin-top: 2rem; margin-left: 0; background: var(--bg-color); color: var(--text-main); border: 1px solid var(--border-color);" onclick="navTo('landing')">Return to Reality</button>
+
+                <div class="magnetic-btn-wrapper" style="width: 100%; display: flex; justify-content: center; margin: 0;">
+                    <button class="btn-primary" style="width: 100%; justify-content: center;" onclick="AppLogic.startCompilation()">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                        Compile .story Project File
+                    </button>
+                </div>
             </div>
-        </div>
-    </main>
+        </main>
+
+        <main id="view-terminal" class="view-layer">
+            <h2 style="margin-bottom: 2rem; font-weight: 700; font-size: 2rem;">Compiling Architecture</h2>
+            <div class="terminal-container">
+                <div class="terminal-header">
+                    <div class="term-dot r"></div><div class="term-dot y"></div><div class="term-dot g"></div>
+                    <span style="margin-left: 1rem; font-size: 0.8rem; color: #71717a; font-family: var(--font-mono);">root@storyline-engine ~</span>
+                </div>
+                <div class="progress-container">
+                    <div class="progress-bar" id="term-progress"><div class="progress-glow"></div></div>
+                </div>
+                <div class="terminal-body" id="term-body">
+                    </div>
+            </div>
+        </main>
+
+        <main id="view-reveal" class="view-layer">
+            <div class="reveal-modal">
+                <h2>Happy April Fools' Day.</h2>
+                
+                <p>Let's be completely honest for a second. Did you actually think an AI was going to perfectly map out your Storyline triggers, layers, and variables without creating an absolute mess?</p>
+                
+                <p>As someone who spends his days deep in Articulate Storyline, let me assure you: <strong>our jobs are safe.</strong></p>
+
+                <p>AI is a fantastic tool, but it cannot replace the empathy, the occasional necessary sarcasm, and the sheer willpower it takes to design a truly effective learning experience. It takes a real human to understand <em>why</em> a learner needs to click that button in the first place.</p>
+
+                <p>Keep building those branching scenarios, keep fighting with custom states, and keep making learning actually work.</p>
+
+                <div class="id-badge-container">
+                    <div class="avatar-glitch">NJ</div>
+                    <div class="id-details">
+                        <h4>Naveen Jose</h4>
+                    </div>
+                </div>
+
+                <div style="margin-top: 3rem;">
+                     <button class="btn-primary" style="background: #f4f4f5; color: #18181b; box-shadow: none; border: 1px solid #e4e4e7;" onclick="Router.navigate('home')">Return to Reality</button>
+                </div>
+            </div>
+        </main>
+    </div>
 
     <script>
-        // --- Navigation Logic ---
-        function navTo(pageId) {
-            // Hide all pages
-            document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
-            // Update nav links
-            document.querySelectorAll('.nav-links a').forEach(link => link.classList.remove('active-link'));
-            
-            if(document.getElementById('link-' + pageId)) {
-                document.getElementById('link-' + pageId).classList.add('active-link');
-            }
-
-            // Show selected page
-            setTimeout(() => {
-                document.getElementById('page-' + pageId).classList.add('active');
-            }, 300);
-        }
-
-        // --- Generation Logic ---
-        function startGeneration() {
-            const promptInput = document.getElementById('ai-prompt');
-            const errorMsg = document.getElementById('prompt-error');
-
-            if (promptInput.value.trim() === '') {
-                promptInput.classList.add('input-error');
-                errorMsg.style.display = 'block';
+        /**
+         * 1. View Router
+         * Handles smooth transitions between the different fake application states.
+         */
+        const Router = {
+            current: 'home',
+            navigate(targetId) {
+                if(this.current === targetId) return;
                 
-                setTimeout(() => { promptInput.classList.remove('input-error'); }, 400);
+                // Hide nav on terminal/reveal for immersion
+                const nav = document.getElementById('main-nav');
+                if(targetId === 'terminal' || targetId === 'reveal') {
+                    nav.style.transform = 'translateY(-100%)';
+                } else {
+                    nav.style.transform = 'translateY(0)';
+                }
+
+                document.getElementById(`view-${this.current}`).classList.remove('is-active');
+                this.current = targetId;
                 
-                promptInput.addEventListener('input', function removeError() {
-                    promptInput.classList.remove('input-error');
-                    errorMsg.style.display = 'none';
-                    promptInput.removeEventListener('input', removeError);
-                });
-                return; 
-            }
-
-            navTo('loading');
-            setTimeout(runLoadingSequence, 500);
-        }
-
-        function runLoadingSequence() {
-            const statusText = document.getElementById('status-text');
-            const subText = document.getElementById('status-subtext');
-            const progressFill = document.getElementById('progress-fill');
-            
-            // The slow progression from technical to humorous
-            const steps = [
-                { time: 0, text: "Parsing natural language into instructional strategy...", sub: "Extracting pedagogical intent", percent: 10 },
-                { time: 2500, text: "Building custom character states and variables...", sub: "Mapping boolean triggers", percent: 25 },
-                { time: 5000, text: "Optimizing for WCAG 2.1 AA compliance...", sub: "Generating alt-text arrays", percent: 40 },
-                { time: 7500, text: "Cross-referencing SME feedback loop probabilities...", sub: "Calculating revision likelihood", percent: 55 },
-                { time: 10000, text: "Attempting to figure out why the 'Next' button isn't appearing...", sub: "Error: Layer overlap detected", percent: 70 },
-                { time: 13000, text: "Realizing that designing good learning actually requires a soul...", sub: "Fatal Error: Empathy not found in LLM", percent: 85 },
-                { time: 16000, text: "Shutting down AI core. Transitioning to manual mode...", sub: "Aborting generation.", percent: 100 }
-            ];
-
-            steps.forEach(step => {
+                // Slight delay for exit animation before entering new view
                 setTimeout(() => {
-                    if(!document.getElementById('page-loading').classList.contains('active')) return;
-                    
-                    statusText.style.opacity = 0;
+                    document.getElementById(`view-${targetId}`).classList.add('is-active');
+                }, 400);
+            }
+        };
+
+        /**
+         * 2. Application Logic & Terminal Simulation
+         */
+        const AppLogic = {
+            startCompilation() {
+                const promptBox = document.getElementById('ai-prompt');
+                if (promptBox.value.trim() === '') {
+                    // Trigger error state
+                    promptBox.classList.add('error-shake');
+                    setTimeout(() => promptBox.classList.remove('error-shake'), 500);
+                    promptBox.focus();
+                    return;
+                }
+                
+                Router.navigate('terminal');
+                setTimeout(() => this.runTerminalSequence(), 1000);
+            },
+
+            runTerminalSequence() {
+                const termBody = document.getElementById('term-body');
+                const progressBar = document.getElementById('term-progress');
+                termBody.innerHTML = ''; // Clear previous
+                
+                // The carefully crafted sequence of logs
+                const logs = [
+                    { t: 0, msg: "Initializing Storyline LLM Compiler v4.2...", type: "highlight", p: 5 },
+                    { t: 800, msg: "Parsing natural language into pedagogical framework...", type: "normal", p: 15 },
+                    { t: 1500, msg: "Extracting vector assets...", type: "normal", p: 25 },
+                    { t: 2200, msg: "Generating text-to-speech audio tracks...", type: "normal", p: 35 },
+                    { t: 3400, msg: "Mapping boolean variables to custom character states...", type: "highlight", p: 45 },
+                    { t: 4200, msg: "Resolving layer visibility conflicts...", type: "warn", p: 55 },
+                    { t: 5500, msg: "Applying WCAG 2.1 AA accessibility tags...", type: "normal", p: 65 },
+                    { t: 6800, msg: "Wait... calculating client revision probability...", type: "normal", p: 75 },
+                    { t: 8000, msg: "WARN: SME feedback loop detected. Logic recursion imminent.", type: "warn", p: 80 },
+                    { t: 9500, msg: "ERROR: Cannot determine why 'Next' button is hidden on slide 4.2", type: "error", p: 85 },
+                    { t: 11000, msg: "CRITICAL: Attempting to replace human instructional design expertise with statistical probability...", type: "error", p: 90 },
+                    { t: 13000, msg: "FATAL: Empathy module not found. Sarcasm threshold exceeded.", type: "error", p: 95 },
+                    { t: 15000, msg: "Shutting down AI core. Transitioning to reality...", type: "highlight", p: 100 }
+                ];
+
+                let autoScroll = true;
+
+                termBody.addEventListener('scroll', () => {
+                    // Stop auto-scrolling if user scrolls up
+                    autoScroll = termBody.scrollHeight - termBody.scrollTop <= termBody.clientHeight + 20;
+                });
+
+                logs.forEach(log => {
                     setTimeout(() => {
-                        statusText.innerText = step.text;
-                        subText.innerText = step.sub;
-                        statusText.style.opacity = 1;
-                    }, 300);
-                    
-                    progressFill.style.width = step.percent + '%';
-                    
-                    if (step.percent === 100) {
-                        setTimeout(() => {
-                            navTo('reveal');
-                        }, 1500);
-                    }
-                }, step.time);
+                        // Only run if we are still on the terminal view
+                        if(Router.current !== 'terminal') return;
+
+                        const now = new Date();
+                        const timeString = `${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}:${now.getSeconds().toString().padStart(2,'0')}.${now.getMilliseconds().toString().padStart(3,'0')}`;
+                        
+                        const line = document.createElement('div');
+                        line.className = 'log-line';
+                        line.innerHTML = `<span class="log-time">[${timeString}]</span><span class="log-msg ${log.type}">${log.msg}</span>`;
+                        
+                        termBody.appendChild(line);
+                        progressBar.style.width = `${log.p}%`;
+
+                        if (autoScroll) {
+                            termBody.scrollTop = termBody.scrollHeight;
+                        }
+
+                        // Trigger the punchline
+                        if (log.p === 100) {
+                            setTimeout(() => {
+                                Router.navigate('reveal');
+                            }, 1800);
+                        }
+                    }, log.t);
+                });
+            }
+        };
+
+        /**
+         * 3. Magnetic Button Effect (Micro-interaction)
+         */
+        document.querySelectorAll('.magnetic-btn-wrapper').forEach(wrapper => {
+            const btn = wrapper.querySelector('.btn-primary');
+            
+            wrapper.addEventListener('mousemove', (e) => {
+                const rect = wrapper.getBoundingClientRect();
+                const x = e.clientX - rect.left - rect.width / 2;
+                const y = e.clientY - rect.top - rect.height / 2;
+                
+                // Move button towards cursor slightly
+                btn.style.transform = `translate(${x * 0.3}px, ${y * 0.3}px)`;
             });
+
+            wrapper.addEventListener('mouseleave', () => {
+                // Snap back
+                btn.style.transform = `translate(0px, 0px)`;
+            });
+        });
+
+        /**
+         * 4. Subtle Ambient Canvas Background (High-End Polish)
+         */
+        const canvas = document.getElementById('ambient-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
         }
+        window.addEventListener('resize', resize);
+        resize();
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 1.5 + 0.5;
+                this.speedX = Math.random() * 0.5 - 0.25;
+                this.speedY = Math.random() * 0.5 - 0.25;
+            }
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                if(this.x > canvas.width) this.x = 0;
+                if(this.x < 0) this.x = canvas.width;
+                if(this.y > canvas.height) this.y = 0;
+                if(this.y < 0) this.y = canvas.height;
+            }
+            draw() {
+                ctx.fillStyle = 'rgba(0,0,0,0.1)';
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        function initParticles() {
+            particles = [];
+            for(let i=0; i<50; i++) { particles.push(new Particle()); }
+        }
+
+        function animateCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => { p.update(); p.draw(); });
+            
+            // Draw subtle lines between close particles
+            ctx.strokeStyle = 'rgba(0,0,0,0.03)';
+            ctx.lineWidth = 0.5;
+            for(let i=0; i<particles.length; i++) {
+                for(let j=i; j<particles.length; j++) {
+                    const dx = particles[i].x - particles[j].x;
+                    const dy = particles[i].y - particles[j].y;
+                    const dist = Math.sqrt(dx*dx + dy*dy);
+                    if(dist < 150) {
+                        ctx.beginPath();
+                        ctx.moveTo(particles[i].x, particles[i].y);
+                        ctx.lineTo(particles[j].x, particles[j].y);
+                        ctx.stroke();
+                    }
+                }
+            }
+            requestAnimationFrame(animateCanvas);
+        }
+
+        initParticles();
+        animateCanvas();
+
     </script>
 </body>
 </html>
