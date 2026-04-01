@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Storyline Simulation Maker™ | Enterprise AI</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        :root {
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --primary: #0f172a; /* Sleek black/dark slate */
+            --primary-hover: #334155;
+            --accent: #2563eb; /* Corporate blue */
+            --border-color: #e2e8f0;
+            --error: #ef4444;
+            --font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: var(--font-family);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* --- Navigation Bar --- */
+        nav {
+            background: var(--card-bg);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 1.25rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .logo svg {
+            color: var(--accent);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-muted);
+            font-weight: 500;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .nav-links a:hover, .nav-links a.active-link {
+            color: var(--text-main);
+        }
+
+        .btn-nav {
+            background: var(--primary);
+            color: white !important;
+            padding: 0.6rem 1.2rem;
+            border-radius: 6px;
+            font-weight: 500;
+        }
+
+        .btn-nav:hover {
+            background: var(--primary-hover);
+        }
+
+        /* --- Main Content Area --- */
+        main {
+            flex: 1;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+        }
+
+        .page {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s ease;
+            padding: 2rem 5%;
+            overflow-y: auto; /* Fixes boundary issues */
+        }
+
+        .page.active {
+            opacity: 1;
+            pointer-events: auto;
+            position: relative; /* Allows content to push height naturally */
+        }
+
+        /* --- UI Panels --- */
+        .clean-panel {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            padding: 3.5rem;
+            border-radius: 12px;
+            box-shadow: var(--shadow-lg);
+            max-width: 900px;
+            width: 100%;
+        }
+
+        h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            letter-spacing: -0.04em;
+            margin-bottom: 1.5rem;
+            line-height: 1.1;
+            text-align: center;
+        }
+
+        p.subtitle {
+            color: var(--text-muted);
+            font-size: 1.2rem;
+            line-height: 1.6;
+            margin-bottom: 3rem;
+            text-align: center;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* --- Buttons --- */
+        .btn-main {
+            background: var(--accent);
+            color: white;
+            font-weight: 500;
+            font-size: 1.1rem;
+            padding: 1rem 2.5rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            margin: 0 auto;
+            display: block;
+        }
+
+        .btn-main:hover {
+            background: #1d4ed8;
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+
+        /* --- Fake Pages (Pricing & About) --- */
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            width: 100%;
+            max-width: 1000px;
+        }
+
+        .pricing-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 2.5rem;
+            text-align: center;
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .pricing-card.popular {
+            border-color: var(--accent);
+            box-shadow: var(--shadow-md);
+            position: relative;
+        }
+
+        .pricing-card.popular::before {
+            content: 'Most Popular';
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--accent);
+            color: white;
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+        }
+
+        .pricing-card h3 { font-size: 1.5rem; margin-bottom: 0.5rem; }
+        .pricing-card .price { font-size: 3rem; font-weight: 700; margin-bottom: 1rem; color: var(--text-main); }
+        .pricing-card .price span { font-size: 1rem; color: var(--text-muted); font-weight: 400; }
+        .pricing-card ul { list-style: none; text-align: left; margin-bottom: 2rem; flex: 1; }
+        .pricing-card ul li { margin-bottom: 0.75rem; font-size: 0.95rem; color: var(--text-muted); display: flex; align-items: center; gap: 0.5rem; }
+
+        .about-content {
+            max-width: 700px;
+            margin: 0 auto;
+            text-align: left;
+        }
+        
+        .about-content h2 { font-size: 2.5rem; margin-bottom: 1.5rem; }
+        .about-content p { font-size: 1.1rem; color: var(--text-muted); line-height: 1.7; margin-bottom: 1.5rem; }
+
+        /* --- Dashboard --- */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1.8fr 1fr;
+            gap: 2rem;
+            text-align: left;
+            margin-bottom: 2rem;
+        }
+
+        .input-group { position: relative; }
+
+        textarea {
+            width: 100%;
+            height: 100%;
+            min-height: 240px;
+            padding: 1.5rem;
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-main);
+            font-size: 1rem;
+            line-height: 1.6;
+            resize: none;
+            transition: var(--transition);
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        textarea.input-error {
+            border-color: var(--error);
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+            animation: shake 0.4s ease-in-out;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-4px); }
+            40%, 80% { transform: translateX(4px); }
+        }
+
+        .error-msg {
+            display: none;
+            color: var(--error);
+            font-size: 0.85rem;
+            font-weight: 500;
+            margin-top: 0.5rem;
+            position: absolute;
+            bottom: -22px;
+            left: 0;
+        }
+
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            padding: 1.5rem;
+            background: var(--bg-color);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        .controls label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+
+        .controls label span { color: var(--accent); }
+
+        input[type="range"] {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 4px;
+            background: #cbd5e1;
+            border-radius: 4px;
+            outline: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: white;
+            border: 2px solid var(--accent);
+            cursor: pointer;
+        }
+
+        /* --- Loading Sequence --- */
+        .loader-container {
+            text-align: center;
+            max-width: 600px;
+            width: 100%;
+        }
+
+        .progress-bar-bg {
+            width: 100%;
+            height: 6px;
+            background: var(--border-color);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+
+        .progress-bar-fill {
+            width: 0%;
+            height: 100%;
+            background: var(--accent);
+            border-radius: 10px;
+            transition: width 0.3s linear;
+        }
+
+        .status-text {
+            font-size: 1.2rem;
+            font-weight: 500;
+            color: var(--text-main);
+            height: 30px;
+            transition: opacity 0.3s;
+        }
+
+        .status-subtext {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-top: 0.5rem;
+            font-family: monospace;
+        }
+
+        /* --- Final Reveal Message --- */
+        .reveal-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            text-align: left;
+            padding: 4rem;
+            max-width: 750px;
+            width: 100%;
+            border-top: 4px solid var(--accent);
+            box-shadow: var(--shadow-lg);
+            /* Prevents boundary issues */
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .reveal-card h2 {
+            font-size: 2.2rem;
+            margin-bottom: 1.5rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+
+        .reveal-card p {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            margin-bottom: 1.5rem;
+            color: var(--text-muted);
+        }
+
+        .reveal-card p strong { color: var(--text-main); }
+
+        .signature {
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 1.25rem;
+        }
+
+        .avatar {
+            width: 60px;
+            height: 60px;
+            background: var(--bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: 600;
+            font-size: 1.2rem;
+            color: var(--accent);
+        }
+
+        .sig-text h4 {
+            font-size: 1.1rem;
+            color: var(--text-main);
+            font-weight: 600;
+            margin-bottom: 0.2rem;
+        }
+
+        .sig-text span {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            line-height: 1.4;
+            display: block;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .dashboard-grid { grid-template-columns: 1fr; }
+            h1 { font-size: 2.5rem; }
+            .nav-links { display: none; }
+            .clean-panel { padding: 2rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="logo" onclick="navTo('landing')">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+            Storyline Simulation Maker™
+        </div>
+        <div class="nav-links">
+            <a onclick="navTo('landing')" id="link-landing" class="active-link">Product</a>
+            <a onclick="navTo('about')" id="link-about">About</a>
+            <a onclick="navTo('pricing')" id="link-pricing">Pricing</a>
+            <a onclick="navTo('dashboard')" class="btn-nav">Workspace Login</a>
+        </div>
+    </nav>
+
+    <main>
+        <div id="page-landing" class="page active">
+            <h1>The end of manual triggers.</h1>
+            <p class="subtitle">Enterprise-grade AI that builds branching scenarios, custom states, and complex variables directly from natural language. Export instantly to .story files.</p>
+            <button class="btn-main" onclick="navTo('dashboard')">Start Generating for Free</button>
+        </div>
+
+        <div id="page-about" class="page">
+            <div class="about-content">
+                <h2>Built by Learning Architects.</h2>
+                <p>Storyline Simulation Maker™ was founded in 2025 by a team of ex-Articulate engineers and enterprise Instructional Designers who were tired of clicking the "Add Trigger" button 400 times a day.</p>
+                <p>We trained our proprietary Large Learning Model (LLM) on over 2 million SCORM packages, extracting the perfect pedagogical logic for branching scenarios, software simulations, and compliance training.</p>
+                <p>Our mission is simple: eliminate the busywork so you can focus on the learning strategy.</p>
+            </div>
+        </div>
+
+        <div id="page-pricing" class="page">
+            <h2 style="font-size: 2.5rem; margin-bottom: 3rem;">Simple, transparent pricing.</h2>
+            <div class="pricing-grid">
+                <div class="pricing-card">
+                    <h3>Freelancer</h3>
+                    <div class="price">$0<span>/mo</span></div>
+                    <ul>
+                        <li>✓ 3 AI Simulations / month</li>
+                        <li>✓ Standard Variable Logic</li>
+                        <li>✓ Basic Triggers</li>
+                        <li style="color: #cbd5e1;">✗ No Synthesia Sync</li>
+                    </ul>
+                    <button class="btn-main" style="width:100%; background: var(--bg-color); color: var(--text-main); border: 1px solid var(--border-color);" onclick="navTo('dashboard')">Start Free</button>
+                </div>
+                <div class="pricing-card popular">
+                    <h3>Professional</h3>
+                    <div class="price">$99<span>/mo</span></div>
+                    <ul>
+                        <li>✓ Unlimited AI Simulations</li>
+                        <li>✓ Complex Variable Architecture</li>
+                        <li>✓ Advanced State Generation</li>
+                        <li>✓ Synthesia API Integration</li>
+                    </ul>
+                    <button class="btn-main" style="width:100%;" onclick="navTo('dashboard')">Start 14-Day Trial</button>
+                </div>
+                <div class="pricing-card">
+                    <h3>Enterprise</h3>
+                    <div class="price">Custom</div>
+                    <ul>
+                        <li>✓ Dedicated LLM Instance</li>
+                        <li>✓ Custom Brand State Templates</li>
+                        <li>✓ Bulk .story Generation API</li>
+                        <li>✓ 24/7 SLA Support</li>
+                    </ul>
+                    <button class="btn-main" style="width:100%; background: var(--bg-color); color: var(--text-main); border: 1px solid var(--border-color);">Contact Sales</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="page-dashboard" class="page">
+            <div class="clean-panel">
+                <h2 style="font-size: 1.5rem; margin-bottom: 2rem; font-weight: 600;">Simulation Architect Workspace</h2>
+                <div class="dashboard-grid">
+                    <div class="input-group">
+                        <textarea id="ai-prompt" placeholder="Describe your module here. e.g., 'Build a branching scenario for de-escalating an angry customer. Include custom character states, track patience using numeric variables, and culminate in an interactive assessment...'"></textarea>
+                        <span id="prompt-error" class="error-msg">Please enter a structural prompt to begin generation.</span>
+                    </div>
+                    <div class="controls">
+                        <div>
+                            <label>Variable Logic Depth <span id="val-logic">85%</span></label>
+                            <input type="range" min="1" max="100" value="85" oninput="document.getElementById('val-logic').innerText = this.value + '%'">
+                        </div>
+                        <div>
+                            <label>Automated Triggers <span id="val-trig">Strict</span></label>
+                            <input type="range" min="1" max="3" value="3" oninput="const states=['Low','Normal','Strict']; document.getElementById('val-trig').innerText = states[this.value-1]">
+                        </div>
+                        <div>
+                            <label>WCAG 2.1 Compliance <span>Enforced</span></label>
+                            <input type="range" min="0" max="1" value="1" disabled style="opacity: 0.5;">
+                        </div>
+                    </div>
+                </div>
+                <button class="btn-main" style="width: 100%; padding: 1.2rem;" onclick="startGeneration()">
+                    Generate .story Project File
+                </button>
+            </div>
+        </div>
+
+        <div id="page-loading" class="page">
+            <div class="loader-container">
+                <h2 style="margin-bottom: 2rem; font-size: 1.8rem;">Compiling Project</h2>
+                <div class="progress-bar-bg">
+                    <div class="progress-bar-fill" id="progress-fill"></div>
+                </div>
+                <div class="status-text" id="status-text">Establishing secure connection...</div>
+                <div class="status-subtext" id="status-subtext">Initializing Engine v4.2</div>
+            </div>
+        </div>
+
+        <div id="page-reveal" class="page">
+            <div class="reveal-card">
+                <h2>Happy April Fools' Day.</h2>
+                <p>Let's be completely honest for a second. Did you actually think an AI was going to perfectly map out your Storyline triggers, layers, and conditional variables without creating an absolute mess?</p>
+                <p>As someone who spends his days deep in Articulate Storyline, Synthesia, and the Adobe Suite, let me assure you: <strong>our jobs are safe.</strong></p>
+                <p>AI is a fantastic tool, but it cannot replace the empathy, the pedagogical insight, the necessary sarcasm, and the sheer willpower it takes to design a truly effective learning experience. It takes a real human to understand <em>why</em> a learner needs to click that button in the first place.</p>
+                <p>Keep building those branching scenarios, keep fighting with custom states, and keep making learning actually work.</p>
+                
+                <div class="signature">
+                    <div class="avatar">NJ</div>
+                    <div class="sig-text">
+                        <h4>Naveen Jose</h4>
+                        <span>Certified Instructional Design Specialist (CIDS)<br>Assistant Manager – Training and Quality</span>
+                    </div>
+                </div>
+                
+                <button class="btn-main" style="margin-top: 2rem; margin-left: 0; background: var(--bg-color); color: var(--text-main); border: 1px solid var(--border-color);" onclick="navTo('landing')">Return to Reality</button>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // --- Navigation Logic ---
+        function navTo(pageId) {
+            // Hide all pages
+            document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+            // Update nav links
+            document.querySelectorAll('.nav-links a').forEach(link => link.classList.remove('active-link'));
+            
+            if(document.getElementById('link-' + pageId)) {
+                document.getElementById('link-' + pageId).classList.add('active-link');
+            }
+
+            // Show selected page
+            setTimeout(() => {
+                document.getElementById('page-' + pageId).classList.add('active');
+            }, 300);
+        }
+
+        // --- Generation Logic ---
+        function startGeneration() {
+            const promptInput = document.getElementById('ai-prompt');
+            const errorMsg = document.getElementById('prompt-error');
+
+            if (promptInput.value.trim() === '') {
+                promptInput.classList.add('input-error');
+                errorMsg.style.display = 'block';
+                
+                setTimeout(() => { promptInput.classList.remove('input-error'); }, 400);
+                
+                promptInput.addEventListener('input', function removeError() {
+                    promptInput.classList.remove('input-error');
+                    errorMsg.style.display = 'none';
+                    promptInput.removeEventListener('input', removeError);
+                });
+                return; 
+            }
+
+            navTo('loading');
+            setTimeout(runLoadingSequence, 500);
+        }
+
+        function runLoadingSequence() {
+            const statusText = document.getElementById('status-text');
+            const subText = document.getElementById('status-subtext');
+            const progressFill = document.getElementById('progress-fill');
+            
+            // The slow progression from technical to humorous
+            const steps = [
+                { time: 0, text: "Parsing natural language into instructional strategy...", sub: "Extracting pedagogical intent", percent: 10 },
+                { time: 2500, text: "Building custom character states and variables...", sub: "Mapping boolean triggers", percent: 25 },
+                { time: 5000, text: "Optimizing for WCAG 2.1 AA compliance...", sub: "Generating alt-text arrays", percent: 40 },
+                { time: 7500, text: "Cross-referencing SME feedback loop probabilities...", sub: "Calculating revision likelihood", percent: 55 },
+                { time: 10000, text: "Attempting to figure out why the 'Next' button isn't appearing...", sub: "Error: Layer overlap detected", percent: 70 },
+                { time: 13000, text: "Realizing that designing good learning actually requires a soul...", sub: "Fatal Error: Empathy not found in LLM", percent: 85 },
+                { time: 16000, text: "Shutting down AI core. Transitioning to manual mode...", sub: "Aborting generation.", percent: 100 }
+            ];
+
+            steps.forEach(step => {
+                setTimeout(() => {
+                    if(!document.getElementById('page-loading').classList.contains('active')) return;
+                    
+                    statusText.style.opacity = 0;
+                    setTimeout(() => {
+                        statusText.innerText = step.text;
+                        subText.innerText = step.sub;
+                        statusText.style.opacity = 1;
+                    }, 300);
+                    
+                    progressFill.style.width = step.percent + '%';
+                    
+                    if (step.percent === 100) {
+                        setTimeout(() => {
+                            navTo('reveal');
+                        }, 1500);
+                    }
+                }, step.time);
+            });
+        }
+    </script>
+</body>
+</html>
